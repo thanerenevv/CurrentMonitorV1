@@ -1,51 +1,21 @@
-name: Build & Release
+- name: Build firmware
+  run: pio run
 
-on:
-  push:
-    tags:
-      - 'v*'
+- name: Merge binaries
+  run: |
+    ~/.platformio/packages/tool-esptoolpy/esptool.py \
+      --chip esp32c3 \
+      merge_bin \
+      --output .pio/build/esp32-c3-devkitm-1/merged.bin \
+      --flash_mode dio \
+      --flash_freq 80m \
+      --flash_size 4MB \
+      0x0000  .pio/build/esp32-c3-devkitm-1/bootloader.bin \
+      0x8000  .pio/build/esp32-c3-devkitm-1/partitions.bin \
+      0x10000 .pio/build/esp32-c3-devkitm-1/firmware.bin
 
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/cache@v4
-        with:
-          path: ~/.platformio
-          key: pio-${{ hashFiles('firmware/platformio.ini') }}
-
-      - name: Install PlatformIO
-        run: pip install platformio
-
-      - name: Build firmware
-        working-directory: firmware
-        run: pio run
-
-      - name: Merge binaries
-        working-directory: firmware
-        run: |
-          ~/.platformio/packages/tool-esptoolpy/esptool.py \
-            --chip esp32c3 \
-            merge_bin \
-            --output .pio/build/esp32-c3-devkitm-1/merged.bin \
-            --flash_mode dio \
-            --flash_freq 80m \
-            --flash_size 4MB \
-            0x0000  .pio/build/esp32-c3-devkitm-1/bootloader.bin \
-            0x8000  .pio/build/esp32-c3-devkitm-1/partitions.bin \
-            0x10000 .pio/build/esp32-c3-devkitm-1/firmware.bin
-
-      - name: Stage release artifact
-        run: |
-          mkdir -p dist
-          cp firmware/.pio/build/esp32-c3-devkitm-1/merged.bin \
-             dist/power-monitor-${{ github.ref_name }}-merged.bin
-
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
-        with:
-          files: dist/*
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+- name: Stage release artifact
+  run: |
+    mkdir -p dist
+    cp .pio/build/esp32-c3-devkitm-1/merged.bin \
+       dist/power-monitor-${{ github.ref_name }}-merged.bin
