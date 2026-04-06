@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Power Monitor — Web Flasher</title>
+<script type="module" src="https://unpkg.com/esp-web-tools@10/dist/web/install-button.js"></script>
+<style>
+  /* paste your existing CSS vars and base styles here,
+     then add the flasher-specific layout below */
+
+  body { background: #0a0c0f; color: #e8eaf0; font-family: 'Barlow', sans-serif; }
+
+  .container { max-width: 560px; margin: 80px auto; padding: 0 24px; }
+
+  h1 { font-size: 2rem; font-weight: 800; margin-bottom: 4px; }
+  .sub { color: #4a5568; font-family: 'Share Tech Mono', monospace;
+         font-size: 0.75rem; letter-spacing: 0.15em; margin-bottom: 48px; }
+
+  label { display: block; font-family: monospace; font-size: 0.7rem;
+          letter-spacing: 0.2em; color: #4a5568; margin-bottom: 8px; }
+
+  select {
+    width: 100%; padding: 14px 16px;
+    background: #111418; border: 1px solid #1e2530; border-radius: 4px;
+    color: #e8eaf0; font-size: 1rem; margin-bottom: 32px;
+    appearance: none; cursor: pointer;
+  }
+
+  esp-web-install-button::part(button) {
+    background: #00e5ff; color: #0a0c0f;
+    border: none; border-radius: 4px;
+    padding: 14px 32px; font-size: 1rem; font-weight: 600;
+    cursor: pointer; width: 100%;
+  }
+
+  .note { margin-top: 32px; font-size: 0.8rem; color: #4a5568; line-height: 1.6; }
+  a { color: #00e5ff; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>Power Monitor</h1>
+  <p class="sub">ESP32-C3 // ACS712-30A // WEB FLASHER</p>
+
+  <label>SELECT VERSION</label>
+  <select id="version-select">
+    <option value="v1.0.0">v1.0.0 — Initial release</option>
+  </select>
+
+  <label>CONNECT & FLASH</label>
+  <esp-web-install-button id="install-btn" manifest="firmware/manifest_v1.0.0.json">
+    <button slot="activate">Install Firmware</button>
+  </esp-web-install-button>
+
+  <p class="note">
+    Requires Chrome or Edge on desktop. USB cable directly to the ESP32-C3.<br>
+    On first boot the device opens a WiFi AP named <strong>PowerMonitor-Setup</strong>
+    for configuration.
+  </p>
+</div>
+
+<script>
+  const select = document.getElementById('version-select');
+  const btn    = document.getElementById('install-btn');
+
+  select.addEventListener('change', () => {
+    btn.manifest = `firmware/manifest_${select.value}.json`;
+  });
+</script>
+</body>
+</html>
