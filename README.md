@@ -4,6 +4,8 @@ A project where it uses an ESP32-C3 and a ACS712 30A with a SSD1306 0.96 OLED fo
 
 Important!! Please edit config.h if your main voltage is not 230V AC, but if your mains is 230V AC then you can flash at https://thanerenevv.github.io/CurrentMonitorV1/
 
+(Currently web flasher doesn't work, please flash the merged bin file manually in releases using esptool.py or flash at https://esptool.spacehuhn.com/ at 0x0)
+
 <img width="500" alt="Screenshot 2569-04-06 at 19 43 56" src="https://github.com/user-attachments/assets/4900e833-3c54-4f5b-b02c-1ed37d149a67" />
 
 Wiring Diagram 
