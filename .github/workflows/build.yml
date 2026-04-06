@@ -1,0 +1,38 @@
+name: Build & Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/cache@v4
+        with:
+          path: ~/.platformio
+          key: pio-${{ hashFiles('firmware/platformio.ini') }}
+
+      - name: Install PlatformIO
+        run: pip install platformio
+
+      - name: Build firmware
+        working-directory: firmware
+        run: pio run
+
+      - name: Collect binaries
+        run: |
+          mkdir -p dist
+          cp firmware/.pio/build/esp32-c3-devkitm-1/firmware.bin dist/firmware-${{ github.ref_name }}.bin
+          cp firmware/.pio/build/esp32-c3-devkitm-1/bootloader.bin dist/bootloader-${{ github.ref_name }}.bin
+          cp firmware/.pio/build/esp32-c3-devkitm-1/partitions.bin dist/partitions-${{ github.ref_name }}.bin
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/*
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
